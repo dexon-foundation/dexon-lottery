@@ -1,0 +1,20 @@
+{
+  "name": "hello-dexon",
+  "version": "0.0.1",
+  "author": "Jimmy Hu",
+  "license": "MIT",
+  "description": "A simple smart contract utilizing DEXON's unbiased randomness.",
+  "homepage": "https://dexon.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dexon-foundation/hello-dexon.git"
+  },
+  "scripts": {
+    "postinstall": "rm -rf node_modules/truffle/node_modules/solc && cp -r node_modules/solc node_modules/truffle/node_modules/",
+    "compile": "node_modules/.bin/truffle compile"
+  },
+  "dependencies": {
+    "truffle": "^4.1.14",
+    "solc": "github:dexon-foundation/dsolc-js#v0.4.25"
+  }
+}
