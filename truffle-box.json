@@ -1,0 +1,14 @@
+{
+  "ignore": [
+    "README.md",
+    ".gitignore",
+    "LICENSE",
+    "contracts/Hello.sol"
+  ],
+  "commands": {
+    "Compile contracts": "npm run compile"
+  },
+  "hooks": {
+    "post-unpack": "npm install"
+  }
+}
