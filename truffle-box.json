@@ -3,10 +3,12 @@
     "README.md",
     ".gitignore",
     "LICENSE",
-    "contracts/Hello.sol"
+    "contracts/Hello.sol",
+    "migrations/2_deploy_hello.js"
   ],
   "commands": {
-    "Compile contracts": "npm run compile"
+    "Compile contracts": "npm run compile",
+    "Deploy contracts on DEXON testnet": "truffle migrate --network=testnet"
   },
   "hooks": {
     "post-unpack": "npm install"

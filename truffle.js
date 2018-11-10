@@ -12,7 +12,18 @@
  *   },
  */
 
+var HDWalletProvider = require("truffle-hdwallet-provider");
+var secret = require('./secret');
+var mnemonic = secret.mnemonic;
+
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
+  networks: {
+    testnet: {
+      provider: new HDWalletProvider(mnemonic,
+        "http://testnet.dexon.org:8545"),
+      network_id: "*"
+    }
+  }
 };
