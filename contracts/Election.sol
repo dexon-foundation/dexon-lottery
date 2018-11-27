@@ -80,7 +80,7 @@ contract Election {
         for (uint x = 0; x < numOfCandidates; x++) {
             address currentAddr = candiatesList[x];
             Candidate storage currentCandidate = candidateData[round][currentAddr];
-            if ((currentCandidate.vote * 5) >= totalVote) {
+            if ((currentCandidate.vote * refundRatio) >= totalVote) {
                 currentAddr.transfer(guaranteedDeposit);
                 emit refund(currentAddr, currentCandidate.name, guaranteedDeposit, round);
             }
