@@ -1,0 +1,8 @@
+{
+  "name": "DEXON DAPP Workshop 1201",
+  "short_name": "MyWAB",
+  "description": "DEXON DAPP Workshop",
+  "background_color": "#ffffff",
+  "crossorigin": "use-credentials",
+  "ios": true
+}

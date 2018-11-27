@@ -1,0 +1,82 @@
+{
+  "name": "my-webapp-boilerplate",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "husky": {
+    "hooks": {
+      "pre-push": ""
+    }
+  },
+  "scripts": {
+    "test": "jest --coverage",
+    "dev": "webpack-dev-server --mode development --host 0.0.0.0",
+    "build": "webpack --mode production --progress",
+    "electron": "npm run test && export BASE_URL=./ && webpack --mode production --target electron-renderer && electron ./electron.js"
+  },
+  "jest": {
+    "globals": {
+      "MODE": "test"
+    },
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/catsass19/My-Webapp-Boilerplate.git"
+  },
+  "author": "catsass19@hotmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/catsass19/My-Webapp-Boilerplate/issues"
+  },
+  "homepage": "https://github.com/catsass19/My-Webapp-Boilerplate#readme",
+  "dependencies": {
+    "@types/lodash-es": "^4.17.1",
+    "@types/react": "^16.4.13",
+    "@types/react-dom": "^16.0.7",
+    "@types/react-loadable": "^5.4.1",
+    "lodash": "^4.17.10",
+    "mobx": "^5.6.0",
+    "mobx-react": "^5.4.2",
+    "moment": "^2.22.2",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-loadable": "^5.5.0",
+    "styled-components": "^4.1.1",
+    "web3": "^1.0.0-beta.33"
+  },
+  "devDependencies": {
+    "cache-loader": "^1.2.2",
+    "clean-terminal-webpack-plugin": "^1.1.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "duplicate-package-checker-webpack-plugin": "^3.0.0",
+    "favicons-webpack-plugin": "0.0.9",
+    "file-loader": "^1.1.11",
+    "fork-ts-checker-webpack-plugin": "^0.5.0",
+    "html-webpack-plugin": "^3.2.0",
+    "husky": "^1.0.0-rc.13",
+    "jest": "^23.5.0",
+    "thread-loader": "^1.2.0",
+    "ts-jest": "^23.1.4",
+    "ts-loader": "^4.5.0",
+    "tslint": "^5.11.0",
+    "typescript": "^2.9.2",
+    "webpack": "^4.20.2",
+    "webpack-bundle-analyzer": "^2.13.1",
+    "webpack-cli": "^3.1.1",
+    "webpack-dev-server": "^3.1.7",
+    "webpack-pwa-manifest": "^3.7.1"
+  }
+}
