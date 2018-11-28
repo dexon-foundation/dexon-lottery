@@ -1,17 +1,17 @@
 {
-  "name": "hello-dexon",
+  "name": "Simple Election DApp",
   "version": "0.0.1",
-  "author": "Jimmy Hu",
   "license": "MIT",
-  "description": "A simple smart contract utilizing DEXON's unbiased randomness.",
+  "description": "A simple election DApp",
   "homepage": "https://dexon.org",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dexon-foundation/hello-dexon.git"
+    "url": "https://github.com/cobinhood/dapp-workshop-1201.git"
   },
   "scripts": {
     "postinstall": "rm -rf node_modules/truffle/node_modules/solc && cp -r node_modules/solc node_modules/truffle/node_modules/; touch secret.js",
     "compile": "node_modules/.bin/truffle compile",
+    "test": "node_modules/.bin/truffle test",
     "deploy": "node_modules/.bin/truffle migrate --network=testnet"
   },
   "dependencies": {

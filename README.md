@@ -1,15 +1,16 @@
-# Hello DEXON
-**Hello DEXON** is a simple smart contract utilizing DEXON's unbiased randomness.
+# Dexon DApp Workshop 12/01 
+**Simple Election DApp**
 
-## Installation
-1. `git clone https://github.com/dexon-foundation/hello-dexon.git`
-2. `cd hello-dexon`
+## Install
 3. `npm install`
 
 ## Compile
 1. `npm run compile`
 
+## Testing
+1. `npm run test`
+
 ## Deploy contract (on DEXON testnet)
 1. Copy `secret.js.sample` to `secret.js`.
 2. Set the `mnemonic` in `secret.js`.
-3. `truffle migrate --network=testnet`
+3. `npm run deploy`

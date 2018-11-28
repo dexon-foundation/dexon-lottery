@@ -34,8 +34,11 @@ contract Election {
 
     // Announce the elected person and restart election
     function resetElection() public onlyOwner {
-        refundDeposit();
-        announceElectedPerson();
+        if (round > 0) {
+            refundDeposit();
+            announceElectedPerson();
+        }
+
         totalVote = 0;
         round += 1;
         isVoting = false;
@@ -88,26 +91,25 @@ contract Election {
     }
 
     function announceElectedPerson() private {
-        if (round > 0) {
-            uint numOfCandidates = candiatesList.length;
-            uint maxVote = 0;
-            address highestCandidate;
-            for (uint x = 0; x < numOfCandidates; x++) {
-                address currentAddr = candiatesList[x];
-                Candidate storage currentCandidate = candidateData[round][currentAddr];
-                if (currentCandidate.vote > maxVote) {
-                    highestCandidate = currentAddr;
-                }
+        uint numOfCandidates = candiatesList.length;
+        uint maxVote = 0;
+        address highestCandidate;
+        for (uint x = 0; x < numOfCandidates; x++) {
+            address currentAddr = candiatesList[x];
+            Candidate storage currentCandidate = candidateData[round][currentAddr];
+            if (currentCandidate.vote > maxVote) {
+                highestCandidate = currentAddr;
+                maxVote = currentCandidate.vote;
             }
-            Candidate storage electedPerson = candidateData[round][highestCandidate];
-            emit elected(round, highestCandidate, electedPerson.name, electedPerson.vote);
-            delete candiatesList;
         }
+        Candidate storage electedPerson = candidateData[round][highestCandidate];
+        emit elected(round, highestCandidate, electedPerson.name, electedPerson.vote);
+        delete candiatesList;
     }
 
     function sponsor(address candidateAddr) public onlyInRegister payable {
         Candidate storage candidate = candidateData[round][candidateAddr];
-        require(candidate.isRegistered == true, "candidate not found");
+        require(candidate.isRegistered == true, "Candidate not exists");
         candidateAddr.transfer(msg.value);
         emit sponsorCandidate(round, candidateAddr, candidate.name, msg.sender, msg.value);
     }
