@@ -127,7 +127,7 @@ contract Election {
     }
 
     modifier onlyInRegister() {
-        require(isVoting == false, "Vote should not be started");
+        require(isVoting == false, "Only allowed before voting period");
         _;
     }
 
