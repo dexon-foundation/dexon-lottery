@@ -160,6 +160,10 @@ export const abi = [
 			{
 				"name": "isRegistered",
 				"type": "bool"
+			},
+			{
+				"name": "number",
+				"type": "uint256"
 			}
 		],
 		"payable": false,

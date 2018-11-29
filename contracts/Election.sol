@@ -13,6 +13,7 @@ contract Election {
         uint vote;
         string name;
         bool isRegistered;
+        uint number;
     }
 
     address[] public candiatesList;
