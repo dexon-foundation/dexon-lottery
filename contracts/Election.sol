@@ -13,7 +13,7 @@ contract Election {
         uint vote;
         string name;
         bool isRegistered;
-        uint number;
+        uint candidateNumber;
     }
 
     address[] public candiatesList;
@@ -51,10 +51,9 @@ contract Election {
         emit voteStart(round);
     }
 
-    function vote(address candidateAddr) public onlyInVote {
+    function vote(address candidateAddr) public onlyInVote candidateShouldExist(candidateAddr) {
         require(voted[round][msg.sender] != true, "Already voted");
         Candidate storage candidate = candidateData[round][candidateAddr];
-        require(candidate.isRegistered == true, "Candidate not exists");
         candidate.vote += 1;
         voted[round][msg.sender] = true;
         emit voteCandidate(round, candidateAddr, msg.sender);
@@ -108,9 +107,8 @@ contract Election {
         delete candiatesList;
     }
 
-    function sponsor(address candidateAddr) public onlyInRegister payable {
+    function sponsor(address candidateAddr) public onlyInRegister candidateShouldExist(candidateAddr) payable {
         Candidate storage candidate = candidateData[round][candidateAddr];
-        require(candidate.isRegistered == true, "Candidate not exists");
         candidateAddr.transfer(msg.value);
         emit sponsorCandidate(round, candidateAddr, candidate.name, msg.sender, msg.value);
     }
@@ -131,6 +129,11 @@ contract Election {
 
     modifier onlyInRegister() {
         require(isVoting == false, "Only allowed before voting period");
+        _;
+    }
+    modifier candidateShouldExist (address candidateAddr) {
+        Candidate storage candidate = candidateData[round][candidateAddr];
+        require(candidate.isRegistered == true, "Candidate not exists");
         _;
     }
 

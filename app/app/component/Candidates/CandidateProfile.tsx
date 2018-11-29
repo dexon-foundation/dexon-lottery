@@ -18,6 +18,8 @@ const Name = styled.div`
 const Padding = styled.div`
   flex: 1;
 `;
+const CandidateNumber = styled.div``;
+
 interface Props {
   id : string;
 }
@@ -27,11 +29,14 @@ class CandidatesProfile extends React.Component<Props> {
   public render() {
     const { id } = this.props;
     const profile = voteService.candidateData[id];
-    console.log(profile);
+    // console.log(profile);
     return (
       <Wrapper>
         {profile && (
           <>
+            <CandidateNumber>
+              {profile.candidateNumber}
+            </CandidateNumber>
             <NameArea>
               <Name>{profile.name}</Name>
               {id}

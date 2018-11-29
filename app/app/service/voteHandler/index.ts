@@ -35,6 +35,7 @@ class VoteHandler {
     [addr : string] : {
       name : string,
       vote : string,
+      candidateNumber : string,
     }
   } = {};
   @observable public electedPerson : {
@@ -97,8 +98,8 @@ class VoteHandler {
     this.guaranteedDeposit = guaranteedDeposit;
     for (const addr of candidatesList) {
       const data = await this.contractRead.methods.candidateData(round, addr).call();
-      const { name, vote } = data;
-      this.candidateData[addr] = { name, vote };
+      const { name, vote, candidateNumber } = data;
+      this.candidateData[addr] = { name, vote, candidateNumber };
     }
     // console.log(isVoting, this.candidatesList, this.candidateData);
     this.contractDataLoaded = true;

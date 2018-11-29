@@ -162,7 +162,7 @@ export const abi = [
 				"type": "bool"
 			},
 			{
-				"name": "number",
+				"name": "candidateNumber",
 				"type": "uint256"
 			}
 		],
