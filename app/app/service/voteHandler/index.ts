@@ -172,7 +172,7 @@ class VoteHandler {
     this.wsHandler = new this.web3.default(WS_PROVIDER());
     this.initDone = true;
 
-    setTimeout(() => this.contractInit('0x623718b15295934386bd7569f42027b911751861'), 500);
+    // setTimeout(() => this.contractInit('0x623718b15295934386bd7569f42027b911751861'), 500);
   }
 
   private getNetworkId = () => this.walletHandler.eth.net.getId();
