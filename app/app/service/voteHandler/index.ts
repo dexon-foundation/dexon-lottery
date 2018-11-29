@@ -71,6 +71,10 @@ class VoteHandler {
 
   }, 200);
 
+  @computed public get guaranteeDepositInDex() {
+    return this.guaranteedDeposit && this.web3.utils.fromWei(this.guaranteedDeposit);
+  }
+
   private walletHandler; // DekuSan Wallet
   private wsHandler; // WS provider
 
@@ -122,8 +126,11 @@ class VoteHandler {
     this.writeContract('register', [name], this.guaranteedDeposit);
   }
   public sponsorCandidate(address : string, amount : string) {
-    this.writeContract('sponsor', [address], amount);
+    this.writeContract('sponsor', [address], this.dexToDei(amount));
   }
+
+  public deiToDex = (amount) => this.web3.utils.fromWei(amount);
+  public dexToDei = (amount) => this.web3.utils.toWei(amount);
 
   private writeContract = async (
     method : string, params : Array<any>, value? : string
@@ -164,6 +171,8 @@ class VoteHandler {
     }
     this.wsHandler = new this.web3.default(WS_PROVIDER());
     this.initDone = true;
+
+    setTimeout(() => this.contractInit('0x623718b15295934386bd7569f42027b911751861'), 500);
   }
 
   private getNetworkId = () => this.walletHandler.eth.net.getId();

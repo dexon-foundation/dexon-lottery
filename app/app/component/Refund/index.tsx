@@ -4,9 +4,27 @@ import styled from 'styled-components';
 import voteService from '@/service/voteHandler';
 
 const Wrapper = styled.div`
-  border: 1px solid gray;
+  flex: 1;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
 `;
-const DataArea = styled.div``;
+const DataArea = styled.div`
+  flex: 1;
+  overflow-y: scroll;
+`;
+
+const Row = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 5px 0px;
+`;
+
+const Highlight = styled.div`
+  color: violet;
+  margin: 5px;
+`;
 
 @observer
 class RefundHistory extends React.Component {
@@ -17,11 +35,12 @@ class RefundHistory extends React.Component {
           <DataArea>
             {voteService.refundHistory.map((it, key) => {
               return (
-                <div key={key}>
-                  round: {it.round} -
-                  candidate: {it.name} -
-                  amount: {it.amount}
-                </div>
+                <Row key={key}>
+                  <Highlight>{it.name}</Highlight>
+                  received
+                  <Highlight>{voteService.deiToDex(it.amount)}</Highlight>
+                  DEX
+                </Row>
               );
             })}
           </DataArea>

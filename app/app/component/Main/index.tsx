@@ -15,15 +15,43 @@ import Refund from '@/component/Refund';
 //     loading: Loading
 // });
 
-const StyledBtn = styled.button``;
+const StyledBtn = styled.button`
+    background-color: black;
+    color: violet;
+    border: none;
+    text-align: center;
+    width: 100px;
+    cursor: pointer;
+    &:hover {
+        font-weight: bold;
+    }
+`;
 const Row = styled.div`
     display: flex;
-    justify-content: center;
+    align-items: center;
+    padding: 10px;
 `;
 const MainArea = styled.div`
     flex: 1;
     display: flex;
-    border: 1px solid red;
+    margin-top: 20px;
+`;
+const HistoryArea = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+`;
+const Padding = styled.div`
+    flex: 1;
+`;
+const State = styled.div`
+    padding: 5px 20px;
+    text-align: right;
+`;
+const Keyword = styled.span`
+    font-weight: bold;
+    color: violet;
 `;
 
 @observer
@@ -36,42 +64,44 @@ class Main extends React.Component {
                 )}
                 {voteService.initDone && (
                     <>
-                        <InputArea />
 
-                        {voteService.contractDataLoaded && (
-                            <>
-                                <Row>
-                                    <StyledBtn
-                                        onClick={() => {
-                                            voteService.startVoting();
-                                        }}
-                                    >
-                                        Start Voting
-                                    </StyledBtn>
-                                    <StyledBtn
-                                        onClick={() => {
-                                            voteService.resetElection();
-                                        }}
-                                    >
-                                        Stop Voting
-                                    </StyledBtn>
-                                    <StyledBtn
-                                        onClick={() => {
-                                            const name = prompt('what is your name?');
-                                            voteService.register(name);
-                                        }}
-                                    >
-                                        Register
-                                    </StyledBtn>
-                                </Row>
-                                {this.voteStatus()}
-                            </>
-                        )}
+                        <>
+                            <Row>
+                                <InputArea />
+                                <Padding />
+                                <StyledBtn
+                                    onClick={() => {
+                                        voteService.startVoting();
+                                    }}
+                                >
+                                    Start Voting
+                                </StyledBtn>
+                                <StyledBtn
+                                    onClick={() => {
+                                        voteService.resetElection();
+                                    }}
+                                >
+                                    Stop Voting
+                                </StyledBtn>
+                                <StyledBtn
+                                    onClick={() => {
+                                        const name = prompt('what is your name?');
+                                        voteService.register(name);
+                                    }}
+                                >
+                                    Register
+                                </StyledBtn>
+                            </Row>
+                            {this.voteStatus()}
+
+                        </>
                         <MainArea>
                             <Candidates />
-                            <History />
-                            <Spnosor />
-                            <Refund />
+                            <HistoryArea>
+                                <History />
+                                <Spnosor />
+                                <Refund />
+                            </HistoryArea>
                         </MainArea>
                     </>
                 )}
@@ -81,13 +111,14 @@ class Main extends React.Component {
 
     private voteStatus() {
         return (
-            <div>
+            <State>
                 {(voteService.isVoting !== undefined) && (
                     (voteService.isVoting)
-                    ? 'Voting!'
-                    : `Register now, deposit fee: ${voteService.guaranteedDeposit}`
+                    ? <Keyword>Voting time!</Keyword>
+                    : <><Keyword>Register now!</Keyword> Guarantee Deposit Fee: <Keyword>${voteService.guaranteeDepositInDex}</Keyword> DEX</>
                 )}
-            </div>
+                {!voteService.isVoting && ('')}
+            </State>
         );
     }
 }

@@ -6,14 +6,18 @@ import CandidatesProfile from './CandidateProfile';
 
 const Wrapper = styled.div`
   flex: 1;
-  text-align: center;
+  padding: 0px 10px;
+  overflow-y: auto;
 `;
+const Title = styled.div`
 
+`;
 @observer
 class Candidates extends React.Component {
   public render() {
     return (
       <Wrapper>
+        <Title>Candidates</Title>
         {voteService.candidatesList.map((it) => (
           <CandidatesProfile key={it} id={it} />
         ))}
