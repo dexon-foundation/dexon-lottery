@@ -2,13 +2,13 @@
 **Simple Election DApp**
 
 ## Install
-3. `npm install`
+`npm install`
 
 ## Compile
-1. `npm run compile`
+`npm run compile`
 
-## Testing
-1. `npm run test`
+## Testing (By using Ganache)
+`npm run test`
 
 ## Deploy contract (on DEXON testnet)
 1. Copy `secret.js.sample` to `secret.js`.
