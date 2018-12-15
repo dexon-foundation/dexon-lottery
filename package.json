@@ -9,14 +9,13 @@
     "url": "https://github.com/cobinhood/dapp-workshop-1201.git"
   },
   "scripts": {
-    "postinstall": "rm -rf node_modules/truffle/node_modules/solc && cp -r node_modules/solc node_modules/truffle/node_modules/; touch secret.js",
-    "compile": "node_modules/.bin/truffle compile",
-    "test": "node_modules/.bin/truffle test",
-    "deploy": "node_modules/.bin/truffle migrate --network=testnet"
+    "postinstall": "touch secret.js",
+    "compile": "dexon-truffle compile",
+    "test": "dexon-truffle test",
+    "deploy": "dexon-truffle migrate --network=testnet"
   },
   "dependencies": {
-    "solc": "github:dexon-foundation/dsolc-js#v0.4.25",
-    "truffle": "^4.1.14",
-    "truffle-hdwallet-provider": "0.0.6"
+    "@dexon-foundation/truffle": "^4.1.16",
+    "truffle-hdwallet-provider": "github:trufflesuite/truffle-hdwallet-provider"
   }
 }
