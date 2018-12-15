@@ -16,7 +16,7 @@ todo:
 - make faster build (happypack or thread-loader)
 
 ## Development
-`npm run dev` and go to: http://localhost:3000
+`npm run dev` and go to: http://localhost:8080
 
 ## Production build
 `npm run build`

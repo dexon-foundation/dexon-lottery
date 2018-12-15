@@ -160,6 +160,7 @@ module.exports = (env, options) => {
                 performance: true,
                 warnings: true,
             },
+            port: 8080
             /*
             proxy: {
                 "/api": {
