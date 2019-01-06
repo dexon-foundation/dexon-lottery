@@ -1,4 +1,4 @@
-# Dexon DApp Workshop 12/01 
+# Dexon DApp Workshop
 **Simple Election DApp**
 
 ## Install
