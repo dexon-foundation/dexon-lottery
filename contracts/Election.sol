@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 contract Election {
 
@@ -16,7 +16,7 @@ contract Election {
         uint candidateNumber;
     }
 
-    address[] public candiatesList;
+    address payable[] public candiatesList;
     mapping(uint => mapping(address => Candidate)) public candidateData;
     mapping(uint => mapping(address => bool)) public voted;
 
@@ -81,7 +81,7 @@ contract Election {
         /* extra - refund guaranteedDeposit */
         uint numOfCandidates = candiatesList.length;
         for (uint x = 0; x < numOfCandidates; x++) {
-            address currentAddr = candiatesList[x];
+            address payable currentAddr = candiatesList[x];
             Candidate storage currentCandidate = candidateData[round][currentAddr];
             if ((currentCandidate.vote * refundRatio) >= totalVote) {
                 currentAddr.transfer(guaranteedDeposit);
@@ -107,13 +107,13 @@ contract Election {
         delete candiatesList;
     }
 
-    function sponsor(address candidateAddr) public onlyInRegister candidateShouldExist(candidateAddr) payable {
+    function sponsor(address payable candidateAddr) public onlyInRegister candidateShouldExist(candidateAddr) payable {
         Candidate storage candidate = candidateData[round][candidateAddr];
         candidateAddr.transfer(msg.value);
         emit sponsorCandidate(round, candidateAddr, candidate.name, msg.sender, msg.value);
     }
 
-    function getCandidatesList() public view returns (address[]) {
+    function getCandidatesList() public view returns (address payable[] memory) {
         return candiatesList;
     }
 
