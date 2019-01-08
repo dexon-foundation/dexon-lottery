@@ -15,7 +15,7 @@
     "deploy": "dexon-truffle migrate --network=testnet"
   },
   "dependencies": {
-    "@dexon-foundation/truffle": "^5.0.8",
+    "@dexon-foundation/truffle": "^5.0.10",
     "truffle-hdwallet-provider": "github:trufflesuite/truffle-hdwallet-provider"
   }
 }
