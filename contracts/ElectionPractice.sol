@@ -10,10 +10,10 @@ pragma solidity ^0.5.0;
  * @title - In this Election Contract, it could take as many rounds of election.
  *        - As a user of this contract, you are able to
  *        - 1. Register as a candiate of the election.
- *        - 2. One vote the candiate of your choose, and can fund any of the candiate as much money as you want.
- *        - 3. Candiate will get the fund if the round is over.
+ *        - 2. Everyone can vote only ONE candidate in each round but we can fund multiple candidates as much money as we want.
+ *        - 3. Candidates will be funded when the current round is over.
  *
- * @dev - There would be only 1 active round each at a time.
+ * @dev - There would be only 1 active round at a time.
  *      - Before round start, any user can use their `wallet` to register as candiate "once".
  *      - Only the contract owner can start voting process and call a voting process to the end.
  *      - Once a voting proces start, no more user can register as candiate.
@@ -70,8 +70,8 @@ contract Election is Events {
 
     /**
      * @notice - With solidity, it gives you "mapping" as one of the data store mechanism.
-     *         - However, you cannot iterate it like you would with "array"
-     *         - because it uses hash table as its mechanism.
+     *         - it's a key-value pair
+     *         - However, you cannot iterate the keys, because it uses hash table as its storing mechanism.
      *         - In theroy, you can use "array" to store data as you would with "mapping".
      *         - Within smart contract, each line of running code cost money.
      *         - In other words, the bigger of an array it gets the higher of gas a user should pay.
@@ -90,8 +90,9 @@ contract Election is Events {
      
      /**
      * @title candiatesList
-     * @dev - This will store candiates data for each active round, and will be reset whenever an election is over.
-     *      - The reason of this approach is because we are not able to iterate "mapping" 
+     * @dev - This array stores candidates address of current round, and will be reset whenever an election is over.
+     *      - The reason of this approach is because we cannot iterate the keys in the mapping There would be only 1 active round at a time.
+
      *
      * @title round 
      * @dev - This is the mark of current active round, and will increase by one if a new round start
