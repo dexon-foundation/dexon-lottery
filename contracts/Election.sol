@@ -96,13 +96,13 @@ contract Election {
         address highestCandidate;
         for (uint x = 0; x < numOfCandidates; x++) {
             address currentAddr = candiatesList[x];
-            Candidate memory currentCandidate = candidateData[round][currentAddr];
+            Candidate storage currentCandidate = candidateData[round][currentAddr];
             if (currentCandidate.vote > maxVote) {
                 highestCandidate = currentAddr;
                 maxVote = currentCandidate.vote;
             }
         }
-        Candidate memory electedPerson = candidateData[round][highestCandidate];
+        Candidate storage electedPerson = candidateData[round][highestCandidate];
         emit elected(round, highestCandidate, electedPerson.name, electedPerson.vote);
         delete candiatesList;
     }
