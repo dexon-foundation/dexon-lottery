@@ -71,7 +71,7 @@ class VoteHandler {
 
   }, 200);
 
-  @computed public get guaranteeDepositInDex() {
+  @computed public get guaranteeDepositInDxn() {
     return this.guaranteedDeposit && this.web3.utils.fromWei(this.guaranteedDeposit);
   }
 
@@ -126,11 +126,11 @@ class VoteHandler {
     this.writeContract('register', [name], this.guaranteedDeposit);
   }
   public sponsorCandidate(address : string, amount : string) {
-    this.writeContract('sponsor', [address], this.dexToDei(amount));
+    this.writeContract('sponsor', [address], this.dxnToDei(amount));
   }
 
-  public deiToDex = (amount) => this.web3.utils.fromWei(amount);
-  public dexToDei = (amount) => this.web3.utils.toWei(amount);
+  public deiToDxn = (amount) => this.web3.utils.fromWei(amount);
+  public dxnToDei = (amount) => this.web3.utils.toWei(amount);
 
   private writeContract = async (
     method : string, params : Array<any>, value? : string

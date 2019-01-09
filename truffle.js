@@ -26,10 +26,9 @@ module.exports = {
       network_id: "*"
     },
     development: {
-      network_id: '*',
+      network_id: "*",
       host: "localhost",
       port: 8545,
-      gas: 4712388
-    }
+    },
   }
 };

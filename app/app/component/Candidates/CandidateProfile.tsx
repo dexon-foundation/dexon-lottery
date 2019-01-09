@@ -91,7 +91,7 @@ class CandidatesProfile extends React.Component<Props> {
             <Padding />
             <StyledBtn
               onClick={() => {
-                const amount = prompt(`How much DEX do you want to sponsor candidate ${profile.name}?`);
+                const amount = prompt(`How much DXN do you want to sponsor candidate ${profile.name}?`);
                 voteService.sponsorCandidate(id, amount);
               }}
             >
