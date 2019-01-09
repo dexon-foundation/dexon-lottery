@@ -1,5 +1,6 @@
-const Election = artifacts.require('Election');
+const Election = artifacts.require('ElectionMock');
 
+const BN = web3.utils.BN;
 const eventHelper = (logs, event) => logs.find(log => log.event)
 
 async function tryCatch(promise, reason) {
@@ -42,7 +43,7 @@ contract('Election', (accounts) => {
 
       const candidateList = await election.getCandidatesList();
       const candidate = candidateList.find(candidate => candidate === accounts[1]);
-      const [vote, name] = await election.candidateData.call(1, candidate);
+      const { 0: vote, 1: name } = await election.candidateData.call(1, candidate);
 
       assert.equal(!!candidate, true);
       assert.equal(vote.toNumber(), 0);
@@ -94,7 +95,7 @@ contract('Election', (accounts) => {
 
       const candidateList = await election.getCandidatesList();
       const candidate = candidateList.find(candidate => candidate === targetCandidate);
-      const [ballots, name] = await election.candidateData.call(1, candidate);
+      const { 0: ballots, 1: name } = await election.candidateData.call(1, candidate);
       const isVoted = await election.voted.call(1, voter);
       const totalVote = (await election.totalVote()).toNumber();
 
@@ -171,7 +172,7 @@ contract('Election', (accounts) => {
 
       const wayneRefundEvent = refundEvents.find(event => event.args.candidate === accounts[0]);
       const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === accounts[1]);
-      const guaranteedDeposit = (await election.guaranteedDeposit()).toNumber();
+      const guaranteedDeposit = await election.guaranteedDeposit();
 
       const candidateList = await election.getCandidatesList();
       const round = (await election.round()).toNumber();
@@ -184,11 +185,11 @@ contract('Election', (accounts) => {
       assert.equal(candidateList.length, 0);
 
       assert.equal(refundEvents.length, 2);
-      assert.equal(wayneRefundEvent.args.amount, guaranteedDeposit);
-      assert.equal(weiChaoRefundEvent.args.amount, guaranteedDeposit);
+      assert(wayneRefundEvent.args.amount.eq(guaranteedDeposit));
+      assert(weiChaoRefundEvent.args.amount.eq(guaranteedDeposit));
       assert.equal(logs[electedEventIndex].args.round.toNumber(), 1);
       assert.equal(logs[electedEventIndex].args.candidate, accounts[0]);
-      assert.equal(logs[electedEventIndex].args.name, 'wayne');
+      assert.equal(logs[electedEventIndex].args.  name, 'wayne');
       assert.equal(logs[electedEventIndex].args.vote.toNumber(), 3);
     });
 
@@ -209,13 +210,15 @@ contract('Election', (accounts) => {
     it('should work correctly', async () => {
       await register('william', accounts[1]);
 
-      const prevBalance = (await web3.eth.getBalance(accounts[1])).toNumber();
+      const prevBalance = new BN(await web3.eth.getBalance(accounts[1]));
 
       await election.sponsor(accounts[1], { from: accounts[0], value: 1e+18 });
 
-      const earn = (await web3.eth.getBalance(accounts[1])).toNumber() - prevBalance;
+      const nextBalance = new BN(await web3.eth.getBalance(accounts[1]));
 
-      assert.equal(earn, 1e+18);
+      const earn = nextBalance.sub(prevBalance);
+
+      assert.equal(web3.utils.fromWei(earn.toString()), 1);
     });
 
     it('should revert if is in voting period', async () => {
