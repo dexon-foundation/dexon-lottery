@@ -34,8 +34,8 @@ class Sponsor extends React.Component {
                 <Row key={key}>
                   <Highlight>{it.name}</Highlight>
                   received
-                  <Highlight>{voteService.deiToDex(it.amount)}</Highlight>
-                  DEX
+                  <Highlight>{voteService.deiToDxn(it.amount)}</Highlight>
+                  DXN
                   from <Highlight>{this.processId(it.sponsor)}</Highlight>
                 </Row>
               );
