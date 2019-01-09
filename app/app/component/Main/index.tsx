@@ -115,7 +115,7 @@ class Main extends React.Component {
                 {(voteService.isVoting !== undefined) && (
                     (voteService.isVoting)
                     ? <Keyword>Voting time!</Keyword>
-                    : <><Keyword>Register now!</Keyword> Guarantee Deposit Fee: <Keyword>${voteService.guaranteeDepositInDxn}</Keyword> Dxn</>
+                    : <><Keyword>Register now!</Keyword> Guarantee Deposit Fee: <Keyword>${voteService.guaranteeDepositInDxn}</Keyword> DXN</>
                 )}
                 {!voteService.isVoting && ('')}
             </State>
