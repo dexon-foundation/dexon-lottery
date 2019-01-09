@@ -189,7 +189,7 @@ contract('Election', (accounts) => {
       assert(weiChaoRefundEvent.args.amount.eq(guaranteedDeposit));
       assert.equal(logs[electedEventIndex].args.round.toNumber(), 1);
       assert.equal(logs[electedEventIndex].args.candidate, accounts[0]);
-      assert.equal(logs[electedEventIndex].args.  name, 'wayne');
+      assert.equal(logs[electedEventIndex].args.name, 'wayne');
       assert.equal(logs[electedEventIndex].args.vote.toNumber(), 3);
     });
 
