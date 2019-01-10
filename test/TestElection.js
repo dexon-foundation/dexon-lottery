@@ -193,6 +193,9 @@ contract('Election', (accounts) => {
   });
 
   describe('refundDeposit()', () => {
+    let initialWayneBalance;
+    let initialWeiChaoBalance;
+
     const aggregateEvent = (logs, name) => logs.reduce((acc, log) => {
       if (log.event === name) {
         acc.push(log);
@@ -200,23 +203,24 @@ contract('Election', (accounts) => {
       return acc;
     }, []);
 
-    it('should work correctly', async () => {
-      const guaranteedDeposit = await election.guaranteedDeposit();
-
-      const prevWayneBalance = await getBalance(candidateAccounts['wayne']);
-      const prevWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
-
+    beforeEach(async () => {
+      initialWayneBalance = await getBalance(candidateAccounts['wayne']);
+      initialWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
       await register(candidateNames[candidateAccounts['wayne']], candidateAccounts['wayne']);
       await register(candidateNames[candidateAccounts['wei-chao']], candidateAccounts['wei-chao']);
       await election.startVoting();
+    })
+
+    it('should work correctly', async () => {
       await vote(candidateAccounts['wayne'], accounts[5]);
       await vote(candidateAccounts['wayne'], accounts[6]);
       await vote(candidateAccounts['wei-chao'], accounts[7]);
 
+      const guaranteedDeposit = await election.guaranteedDeposit();
       const nextWayneBalance = await getBalance(candidateAccounts['wayne']);
       const nextWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
-      const wayneGasFeeOfRegister = prevWayneBalance.sub(nextWayneBalance).sub(guaranteedDeposit);
-      const weiChaoGasFeeOfRegister = prevWeiChaoBalance.sub(nextWeiChaoBalance).sub(guaranteedDeposit);
+      const wayneGasFeeOfRegister = initialWayneBalance.sub(nextWayneBalance).sub(guaranteedDeposit);
+      const weiChaoGasFeeOfRegister = initialWeiChaoBalance.sub(nextWeiChaoBalance).sub(guaranteedDeposit);
 
       const { logs } = await election.refundDeposit();
       const refundEvents = aggregateEvent(logs, 'refund');
@@ -227,16 +231,13 @@ contract('Election', (accounts) => {
       const finalWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
 
       assert.equal(refundEvents.length, 2);
-      assert(prevWayneBalance.sub(wayneGasFeeOfRegister).eq(finalWayneBalance));
-      assert(prevWeiChaoBalance.sub(weiChaoGasFeeOfRegister).eq(finalWeiChaoBalance));
+      assert(initialWayneBalance.sub(wayneGasFeeOfRegister).eq(finalWayneBalance));
+      assert(initialWeiChaoBalance.sub(weiChaoGasFeeOfRegister).eq(finalWeiChaoBalance));
       assert(wayneRefundEvent.args.amount.eq(guaranteedDeposit));
       assert(weiChaoRefundEvent.args.amount.eq(guaranteedDeposit));
     });
 
     it('should work correctly if candidate not reach the refund ratio', async () => {
-      await register(candidateNames[candidateAccounts['wayne']], candidateAccounts['wayne']);
-      await register(candidateNames[candidateAccounts['wei-chao']], candidateAccounts['wei-chao']);
-      await election.startVoting();
       await vote(candidateAccounts['wayne'], accounts[5]);
 
       const prevWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
@@ -244,11 +245,13 @@ contract('Election', (accounts) => {
       const { logs } = await election.refundDeposit();
       const refundEvents = aggregateEvent(logs, 'refund');
 
+      const wayneRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wayne']);
       const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wei-chao']);
       const nextWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
 
       assert.equal(refundEvents.length, 1);
       assert.isUndefined(weiChaoRefundEvent);
+      assert(wayneRefundEvent);
       assert(prevWeiChaoBalance.eq(nextWeiChaoBalance));
     });
   });
