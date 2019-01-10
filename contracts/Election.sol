@@ -36,8 +36,8 @@ contract Election {
     // Announce the elected person and restart election
     function resetElection() public onlyOwner {
         if (round > 0) {
-            refundDeposit();
-            announceElectedPerson();
+            _refundDeposit();
+            _announceElectedPerson();
         }
 
         totalVote = 0;
@@ -77,7 +77,7 @@ contract Election {
         emit registered(round, msg.sender);
     }
 
-    function refundDeposit() private {
+    function _refundDeposit() internal {
         /* extra - refund guaranteedDeposit */
         uint numOfCandidates = candiatesList.length;
         for (uint x = 0; x < numOfCandidates; x++) {
@@ -90,7 +90,7 @@ contract Election {
         }
     }
 
-    function announceElectedPerson() private {
+    function _announceElectedPerson() internal {
         uint numOfCandidates = candiatesList.length;
         uint maxVote = 0;
         address highestCandidate;
