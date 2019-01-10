@@ -193,6 +193,13 @@ contract('Election', (accounts) => {
   });
 
   describe('refundDeposit()', () => {
+    const aggregateEvent = (logs, name) => logs.reduce((acc, log) => {
+      if (log.event === name) {
+        acc.push(log);
+      }
+      return acc;
+    }, []);
+
     it('should work correctly', async () => {
       const guaranteedDeposit = await election.guaranteedDeposit();
 
@@ -212,12 +219,7 @@ contract('Election', (accounts) => {
       const weiChaoGasFeeOfRegister = prevWeiChaoBalance.sub(nextWeiChaoBalance).sub(guaranteedDeposit);
 
       const { logs } = await election.refundDeposit();
-      const refundEvents = logs.reduce((acc, log) => {
-        if (log.event === 'refund') {
-          acc.push(log);
-        }
-        return acc;
-      }, []);
+      const refundEvents = aggregateEvent(logs, 'refund');
 
       const wayneRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wayne']);
       const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wei-chao']);
@@ -240,12 +242,7 @@ contract('Election', (accounts) => {
       const prevWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
 
       const { logs } = await election.refundDeposit();
-      const refundEvents = logs.reduce((acc, log) => {
-        if (log.event === 'refund') {
-          acc.push(log);
-        }
-        return acc;
-      }, []);
+      const refundEvents = aggregateEvent(logs, 'refund');
 
       const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wei-chao']);
       const nextWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
@@ -262,7 +259,6 @@ contract('Election', (accounts) => {
       const { logs } = await election.announceElectedPerson();
       const candidateList = await election.getCandidatesList();
       const electedEventIndex = logs.findIndex(log => log.event === 'elected');
-      
 
       assert(electedEventIndex >= 0);
       
@@ -284,13 +280,13 @@ contract('Election', (accounts) => {
 
   describe('sponsor()', () => {
     it('should work correctly', async () => {
-      await register('william', accounts[1]);
+      await register(candidateNames[candidateAccounts['william']], candidateAccounts['william']);
 
-      const prevBalance = new BN(await web3.eth.getBalance(accounts[1]));
+      const prevBalance = await getBalance(candidateAccounts['william']);
 
-      await election.sponsor(accounts[1], { from: accounts[0], value: 1e+18 });
+      await election.sponsor(candidateAccounts['william'], { from: accounts[0], value: 1e+18 });
 
-      const nextBalance = new BN(await web3.eth.getBalance(accounts[1]));
+      const nextBalance = await getBalance(candidateAccounts['william']);
 
       const earn = nextBalance.sub(prevBalance);
 
@@ -298,14 +294,14 @@ contract('Election', (accounts) => {
     });
 
     it('should revert if is in voting period', async () => {
-      await register('william', accounts[1]);
+      await register(candidateNames[candidateAccounts['william']], candidateAccounts['william']);
       await election.startVoting();
 
-      tryCatch(election.sponsor(accounts[1], { from: accounts[0], value: 1e+18 }), 'Only allowed before voting period');
+      tryCatch(election.sponsor(candidateAccounts['william'], { from: accounts[0], value: 1e+18 }), 'Only allowed before voting period');
     });
 
     it('should revert if is in voting period', async () => {
-      tryCatch(election.sponsor(accounts[1], { from: accounts[0], value: 1e+18 }), 'Candidate not exists');
+      tryCatch(election.sponsor(candidateAccounts['william'], { from: accounts[0], value: 1e+18 }), 'Candidate not exists');
     });
   });
 });
