@@ -1,7 +1,8 @@
 const Election = artifacts.require('ElectionMock');
 
 const BN = web3.utils.BN;
-const eventHelper = (logs, event) => logs.find(log => log.event)
+
+const getBalance = async (address) => new BN(await web3.eth.getBalance(address));
 
 async function tryCatch(promise, reason) {
   try {
@@ -16,7 +17,36 @@ async function tryCatch(promise, reason) {
 contract('Election', (accounts) => {
   let election;
 
+  const candidateNames = {
+    [accounts[1]]: 'wayne',
+    [accounts[2]]: 'wei-chao',
+    [accounts[3]]: 'william',
+  };
+
+  const candidateAccounts = {
+    wayne: accounts[1],
+    'wei-chao': accounts[2],
+    william: accounts[3],
+  };
+
   const register = (name, account, value = 1e+18) => election.register(name, { from: account, value });
+
+  const vote = (targetCandidate, voter = accounts[1]) => election.vote(targetCandidate, { from: voter });
+
+  const processARoundOfVoting = async () => {
+    await register(candidateNames[candidateAccounts['wayne']], candidateAccounts['wayne']);
+    await register(candidateNames[candidateAccounts['wei-chao']], candidateAccounts['wei-chao']);
+    await register(candidateNames[candidateAccounts['william']], candidateAccounts['william']);
+
+    await election.startVoting();
+
+    await vote(candidateAccounts['wayne'], accounts[4]);
+    await vote(candidateAccounts['wayne'], accounts[5]);
+    await vote(candidateAccounts['wayne'], accounts[6]);
+    await vote(candidateAccounts['wei-chao'], accounts[7]);
+    await vote(candidateAccounts['wei-chao'], accounts[8]);
+    await vote(candidateAccounts['william'], accounts[9]);
+  }
 
   beforeEach('setup contract for each test', async () => {
     election = await Election.new();
@@ -70,25 +100,19 @@ contract('Election', (accounts) => {
   });
 
   describe('vote()', () => {
-    const candidateNames = {
-      [accounts[0]]: 'wayne',
-      [accounts[1]]: 'wei chao',
-      [accounts[2]]: 'william',
-    };
-
     const vote = (targetCandidate, voter = accounts[1]) => election.vote(targetCandidate, { from: voter });
 
     beforeEach('setup candidate', async () => {
-      await register('wayne', accounts[0]);
-      await register('wei chao', accounts[1]);
-      await register('william', accounts[2]);
+      await register(candidateNames[candidateAccounts['wayne']], candidateAccounts['wayne']);
+      await register(candidateNames[candidateAccounts['wei-chao']], candidateAccounts['wei-chao']);
+      await register(candidateNames[candidateAccounts['william']], candidateAccounts['william']);
     });
 
     it('should work correctly', async () => {
       await election.startVoting();
 
       const voter = accounts[1];
-      const targetCandidate = accounts[0];
+      const targetCandidate = candidateAccounts['william'];
 
       const { logs } = await vote(targetCandidate, voter);
       const eventIndex = logs.findIndex(log => log.event === 'voteCandidate');
@@ -111,15 +135,16 @@ contract('Election', (accounts) => {
     });
 
     it('should revert if it is not in the voting period', async () => {
-      await tryCatch(vote(accounts[0]), 'Voting should be started');
+      await tryCatch(vote(candidateAccounts['william']), 'Voting should be started');
     });
 
     it('should revert if user already voted', async () => {
       await election.startVoting();
-      await vote(accounts[0]);
+      await vote(candidateAccounts['william']);
 
-      await tryCatch(vote(accounts[0]), 'Already voted');
-      await tryCatch(vote(accounts[1]), 'Already voted');
+      await tryCatch(vote(candidateAccounts['wayne']), 'Already voted');
+      await tryCatch(vote(candidateAccounts['wei-chao']), 'Already voted');
+      await tryCatch(vote(candidateAccounts['william']), 'Already voted');
     });
 
     it('should revert if user already voted', async () => {
@@ -130,7 +155,7 @@ contract('Election', (accounts) => {
   });
 
   describe('resetElection()', () => {
-    it('should work correclty at zero round', async () => {
+    it('should work correclty', async () => {
       await election.resetElection();
       const round = (await election.round()).toNumber();
       const isVoting = await election.isVoting();
@@ -138,41 +163,16 @@ contract('Election', (accounts) => {
       const candidateList = await election.getCandidatesList();
 
       assert.equal(totalVote, 0);
-      assert.equal(round, 2);
+      assert.equal(round, 2); // we get two after first round and then reset again 
       assert.equal(isVoting, false);
       assert.equal(candidateList.length, 0);
     });
 
     it('should work correclty at first round', async () => {
-      // Bad smells(bad pratice) here. Please extract private functions to library to test it if you want to test those private functions.
-      const vote = (targetCandidate, voter = accounts[1]) => election.vote(targetCandidate, { from: voter });
-
-      await register('wayne', accounts[0]);
-      await register('wei chao', accounts[1]);
-      await register('william', accounts[2]);
-
-      await election.startVoting();
-
-      await vote(accounts[0], accounts[0]);
-      await vote(accounts[0], accounts[1]);
-      await vote(accounts[0], accounts[2]);
-      await vote(accounts[1], accounts[3]);
-      await vote(accounts[1], accounts[4]);
-      await vote(accounts[2], accounts[5]);
-
+      await processARoundOfVoting();
       const { logs } = await election.resetElection();
       const electedEventIndex = logs.findIndex(log => log.event === 'elected');
-      const refundEvents = logs.reduce((acc, log) => {
-        if (log.event === 'refund') {
-          acc.push(log);
-        }
-
-        return acc;
-      }, []);
-
-      const wayneRefundEvent = refundEvents.find(event => event.args.candidate === accounts[0]);
-      const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === accounts[1]);
-      const guaranteedDeposit = await election.guaranteedDeposit();
+      const lengthOfRefundEvents = logs.reduce((acc, log) => (log.event === 'refund' ? acc + 1 : acc), 0);
 
       const candidateList = await election.getCandidatesList();
       const round = (await election.round()).toNumber();
@@ -183,18 +183,93 @@ contract('Election', (accounts) => {
       assert.equal(round, 2);
       assert.equal(isVoting, false);
       assert.equal(candidateList.length, 0);
-
-      assert.equal(refundEvents.length, 2);
-      assert(wayneRefundEvent.args.amount.eq(guaranteedDeposit));
-      assert(weiChaoRefundEvent.args.amount.eq(guaranteedDeposit));
-      assert.equal(logs[electedEventIndex].args.round.toNumber(), 1);
-      assert.equal(logs[electedEventIndex].args.candidate, accounts[0]);
-      assert.equal(logs[electedEventIndex].args.name, 'wayne');
-      assert.equal(logs[electedEventIndex].args.vote.toNumber(), 3);
+      assert.equal(lengthOfRefundEvents, 2);
+      assert(electedEventIndex >= 0);
     });
 
     it('should revert if it is not called by owner', async () => {
       tryCatch(election.resetElection({ from: accounts[1] }), 'Only owner is allowed');
+    });
+  });
+
+  describe('refundDeposit()', () => {
+    let initialWayneBalance;
+    let initialWeiChaoBalance;
+
+    const aggregateEvent = (logs, name) => logs.reduce((acc, log) => {
+      if (log.event === name) {
+        acc.push(log);
+      }
+      return acc;
+    }, []);
+
+    beforeEach(async () => {
+      initialWayneBalance = await getBalance(candidateAccounts['wayne']);
+      initialWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
+      await register(candidateNames[candidateAccounts['wayne']], candidateAccounts['wayne']);
+      await register(candidateNames[candidateAccounts['wei-chao']], candidateAccounts['wei-chao']);
+      await election.startVoting();
+    })
+
+    it('should work correctly', async () => {
+      await vote(candidateAccounts['wayne'], accounts[5]);
+      await vote(candidateAccounts['wayne'], accounts[6]);
+      await vote(candidateAccounts['wei-chao'], accounts[7]);
+
+      const guaranteedDeposit = await election.guaranteedDeposit();
+      const nextWayneBalance = await getBalance(candidateAccounts['wayne']);
+      const nextWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
+      const wayneGasFeeOfRegister = initialWayneBalance.sub(nextWayneBalance).sub(guaranteedDeposit);
+      const weiChaoGasFeeOfRegister = initialWeiChaoBalance.sub(nextWeiChaoBalance).sub(guaranteedDeposit);
+
+      const { logs } = await election.refundDeposit();
+      const refundEvents = aggregateEvent(logs, 'refund');
+
+      const wayneRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wayne']);
+      const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wei-chao']);
+      const finalWayneBalance = await getBalance(candidateAccounts['wayne']);
+      const finalWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
+
+      assert.equal(refundEvents.length, 2);
+      assert(initialWayneBalance.sub(wayneGasFeeOfRegister).eq(finalWayneBalance));
+      assert(initialWeiChaoBalance.sub(weiChaoGasFeeOfRegister).eq(finalWeiChaoBalance));
+      assert(wayneRefundEvent.args.amount.eq(guaranteedDeposit));
+      assert(weiChaoRefundEvent.args.amount.eq(guaranteedDeposit));
+    });
+
+    it('should work correctly if candidate not reach the refund ratio', async () => {
+      await vote(candidateAccounts['wayne'], accounts[5]);
+
+      const prevWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
+
+      const { logs } = await election.refundDeposit();
+      const refundEvents = aggregateEvent(logs, 'refund');
+
+      const wayneRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wayne']);
+      const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wei-chao']);
+      const nextWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
+
+      assert.equal(refundEvents.length, 1);
+      assert.isUndefined(weiChaoRefundEvent);
+      assert(wayneRefundEvent);
+      assert(prevWeiChaoBalance.eq(nextWeiChaoBalance));
+    });
+  });
+
+  describe('announceElectedPerson()', () => {
+    it('should work correctly', async () => {
+      await processARoundOfVoting();
+      const { logs } = await election.announceElectedPerson();
+      const candidateList = await election.getCandidatesList();
+      const electedEventIndex = logs.findIndex(log => log.event === 'elected');
+
+      assert(electedEventIndex >= 0);
+      
+      assert.equal(candidateList.length, 0);
+      assert.equal(logs[electedEventIndex].args.round.toNumber(), 1);
+      assert.equal(logs[electedEventIndex].args.candidate, candidateAccounts['wayne']);
+      assert.equal(logs[electedEventIndex].args.name, 'wayne');
+      assert.equal(logs[electedEventIndex].args.vote.toNumber(), 3);
     });
   });
 
@@ -208,13 +283,13 @@ contract('Election', (accounts) => {
 
   describe('sponsor()', () => {
     it('should work correctly', async () => {
-      await register('william', accounts[1]);
+      await register(candidateNames[candidateAccounts['william']], candidateAccounts['william']);
 
-      const prevBalance = new BN(await web3.eth.getBalance(accounts[1]));
+      const prevBalance = await getBalance(candidateAccounts['william']);
 
-      await election.sponsor(accounts[1], { from: accounts[0], value: 1e+18 });
+      await election.sponsor(candidateAccounts['william'], { from: accounts[0], value: 1e+18 });
 
-      const nextBalance = new BN(await web3.eth.getBalance(accounts[1]));
+      const nextBalance = await getBalance(candidateAccounts['william']);
 
       const earn = nextBalance.sub(prevBalance);
 
@@ -222,14 +297,14 @@ contract('Election', (accounts) => {
     });
 
     it('should revert if is in voting period', async () => {
-      await register('william', accounts[1]);
+      await register(candidateNames[candidateAccounts['william']], candidateAccounts['william']);
       await election.startVoting();
 
-      tryCatch(election.sponsor(accounts[1], { from: accounts[0], value: 1e+18 }), 'Only allowed before voting period');
+      tryCatch(election.sponsor(candidateAccounts['william'], { from: accounts[0], value: 1e+18 }), 'Only allowed before voting period');
     });
 
     it('should revert if is in voting period', async () => {
-      tryCatch(election.sponsor(accounts[1], { from: accounts[0], value: 1e+18 }), 'Candidate not exists');
+      tryCatch(election.sponsor(candidateAccounts['william'], { from: accounts[0], value: 1e+18 }), 'Candidate not exists');
     });
   });
 });
