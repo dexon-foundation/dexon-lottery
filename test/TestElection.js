@@ -2,6 +2,8 @@ const Election = artifacts.require('ElectionMock');
 
 const BN = web3.utils.BN;
 
+const getBalance = async (address) => new BN(await web3.eth.getBalance(address));
+
 async function tryCatch(promise, reason) {
   try {
     await promise;
@@ -29,9 +31,9 @@ contract('Election', (accounts) => {
 
   const register = (name, account, value = 1e+18) => election.register(name, { from: account, value });
 
-  const processARoundOfVoting = async () => {
-    const vote = (targetCandidate, voter = accounts[1]) => election.vote(targetCandidate, { from: voter });
+  const vote = (targetCandidate, voter = accounts[1]) => election.vote(targetCandidate, { from: voter });
 
+  const processARoundOfVoting = async () => {
     await register(candidateNames[candidateAccounts['wayne']], candidateAccounts['wayne']);
     await register(candidateNames[candidateAccounts['wei-chao']], candidateAccounts['wei-chao']);
     await register(candidateNames[candidateAccounts['william']], candidateAccounts['william']);
@@ -44,10 +46,6 @@ contract('Election', (accounts) => {
     await vote(candidateAccounts['wei-chao'], accounts[7]);
     await vote(candidateAccounts['wei-chao'], accounts[8]);
     await vote(candidateAccounts['william'], accounts[9]);
-
-    const { logs } = await election.resetElection();
-
-    return logs;
   }
 
   beforeEach('setup contract for each test', async () => {
@@ -171,7 +169,8 @@ contract('Election', (accounts) => {
     });
 
     it('should work correclty at first round', async () => {
-      const logs = await processARoundOfVoting();
+      await processARoundOfVoting();
+      const { logs } = await election.resetElection();
       const electedEventIndex = logs.findIndex(log => log.event === 'elected');
       const lengthOfRefundEvents = logs.reduce((acc, log) => (log.event === 'refund' ? acc + 1 : acc), 0);
 
@@ -194,41 +193,80 @@ contract('Election', (accounts) => {
   });
 
   describe('refundDeposit()', () => {
-    it.only('should work correctly', async () => {
-      const getBalance = async (address) => new BN(await web3.eth.getBalance(address));
+    it('should work correctly', async () => {
+      const guaranteedDeposit = await election.guaranteedDeposit();
+
       const prevWayneBalance = await getBalance(candidateAccounts['wayne']);
       const prevWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
-      console.log((await getBalance(candidateAccounts['wayne'])).toString());
-      const logs = await processARoundOfVoting();
-      console.log((await getBalance(candidateAccounts['wayne'])).toString());
+
+      await register(candidateNames[candidateAccounts['wayne']], candidateAccounts['wayne']);
+      await register(candidateNames[candidateAccounts['wei-chao']], candidateAccounts['wei-chao']);
+      await election.startVoting();
+      await vote(candidateAccounts['wayne'], accounts[5]);
+      await vote(candidateAccounts['wayne'], accounts[6]);
+      await vote(candidateAccounts['wei-chao'], accounts[7]);
+
+      const nextWayneBalance = await getBalance(candidateAccounts['wayne']);
+      const nextWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
+      const wayneGasFeeOfRegister = prevWayneBalance.sub(nextWayneBalance).sub(guaranteedDeposit);
+      const weiChaoGasFeeOfRegister = prevWeiChaoBalance.sub(nextWeiChaoBalance).sub(guaranteedDeposit);
+
+      const { logs } = await election.refundDeposit();
       const refundEvents = logs.reduce((acc, log) => {
         if (log.event === 'refund') {
           acc.push(log);
         }
-
         return acc;
       }, []);
-      
 
       const wayneRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wayne']);
       const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wei-chao']);
-      const guaranteedDeposit = await election.guaranteedDeposit();
-      const nextWayneBalance = await getBalance(candidateAccounts['wayne']);
-      const nextWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
-      console.log(nextWayneBalance.sub(prevWayneBalance).toString());
+      const finalWayneBalance = await getBalance(candidateAccounts['wayne']);
+      const finalWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
 
       assert.equal(refundEvents.length, 2);
+      assert(prevWayneBalance.sub(wayneGasFeeOfRegister).eq(finalWayneBalance));
+      assert(prevWeiChaoBalance.sub(weiChaoGasFeeOfRegister).eq(finalWeiChaoBalance));
       assert(wayneRefundEvent.args.amount.eq(guaranteedDeposit));
       assert(weiChaoRefundEvent.args.amount.eq(guaranteedDeposit));
+    });
+
+    it('should work correctly if candidate not reach the refund ratio', async () => {
+      await register(candidateNames[candidateAccounts['wayne']], candidateAccounts['wayne']);
+      await register(candidateNames[candidateAccounts['wei-chao']], candidateAccounts['wei-chao']);
+      await election.startVoting();
+      await vote(candidateAccounts['wayne'], accounts[5]);
+
+      const prevWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
+
+      const { logs } = await election.refundDeposit();
+      const refundEvents = logs.reduce((acc, log) => {
+        if (log.event === 'refund') {
+          acc.push(log);
+        }
+        return acc;
+      }, []);
+
+      const weiChaoRefundEvent = refundEvents.find(event => event.args.candidate === candidateAccounts['wei-chao']);
+      const nextWeiChaoBalance = await getBalance(candidateAccounts['wei-chao']);
+
+      assert.equal(refundEvents.length, 1);
+      assert.isUndefined(weiChaoRefundEvent);
+      assert(prevWeiChaoBalance.eq(nextWeiChaoBalance));
     });
   });
 
   describe('announceElectedPerson()', () => {
     it('should work correctly', async () => {
-      const logs = await processARoundOfVoting();
+      await processARoundOfVoting();
+      const { logs } = await election.announceElectedPerson();
+      const candidateList = await election.getCandidatesList();
       const electedEventIndex = logs.findIndex(log => log.event === 'elected');
+      
 
       assert(electedEventIndex >= 0);
+      
+      assert.equal(candidateList.length, 0);
       assert.equal(logs[electedEventIndex].args.round.toNumber(), 1);
       assert.equal(logs[electedEventIndex].args.candidate, candidateAccounts['wayne']);
       assert.equal(logs[electedEventIndex].args.name, 'wayne');
