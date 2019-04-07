@@ -16,9 +16,16 @@
     "console": "dexon-truffle console --network=testnet"
   },
   "dependencies": {
+    "@cobinhood/web3": "1.0.0-beta.35",
     "@dexon-foundation/truffle": "^5.0.15",
     "@dexon-foundation/truffle-contract": "^4.0.12",
+    "bip39": "^3.0.0",
+    "ethereumjs-wallet": "^0.6.3",
     "openzeppelin-solidity": "^2.1.3",
     "truffle-hdwallet-provider": "^1.0.1"
+  },
+  "devDependencies": {
+    "@cobinhood/eslint-config-cobinhood": "^0.2.0",
+    "eslint": "^5.16.0"
   }
 }
