@@ -22,13 +22,21 @@ module.exports = {
   networks: {
     testnet: {
       provider: new HDWalletProvider(mnemonic,
-        "http://testnet.dexon.org:8545", 0, 1, true, "m/44'/237'/0'/0/"),
-      network_id: "*"
+        "https://testnet-rpc.dexon.org", 0, 1, true, "m/44'/237'/0'/0/"),
+      network_id: "*",
+      gasPrice: 24000000000,
     },
+
     development: {
       network_id: "*",
       host: "localhost",
       port: 8545,
+      gasLimit: 7984452,
     },
-  }
+  },
+  // compilers: {
+  //   solc: {
+  //     version: "0.5.2" // ex:  "0.4.20". (Default: Truffle's installed solc)
+  //   }
+  // }
 };
