@@ -26,7 +26,7 @@ import './global-styles';
 
 // Observe loading of Overpass (to remove Overpass, remove the <link> tag in
 // the index.html file and this observer)
-const overpassObserver = new FontFaceObserver('Overpass', {});
+const overpassObserver = new FontFaceObserver('Overpass Mono', {});
 
 // When Overpass is loaded, add a font-family using Overpass to the body
 overpassObserver.load().then(() => {
@@ -42,15 +42,5 @@ const render = () => {
     MOUNT_NODE,
   );
 };
-
-if (module.hot) {
-  // Hot reloadable React components and translation json files
-  // modules.hot.accept does not accept dynamic dependencies,
-  // have to be constants at compile-time
-  module.hot.accept(['containers/App'], () => {
-    ReactDOM.unmountComponentAtNode(MOUNT_NODE);
-    render();
-  });
-}
 
 render();

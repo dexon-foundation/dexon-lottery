@@ -1,5 +1,4 @@
 import { injectGlobal } from 'styled-components';
-import { COLOR_WHITE, COLOR_BLUE } from '@/constants/colors';
 
 /* eslint no-unused-expressions: 0 */
 injectGlobal`
@@ -13,11 +12,12 @@ injectGlobal`
   }
 
   body.fontLoaded {
-    font-family: 'Overpass', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Overpass Mono', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   #app {
-    background-color: ${COLOR_WHITE};
+    color: white;
+    background-color: black;
     min-height: 100%;
     min-width: 100%;
   }
@@ -25,10 +25,6 @@ injectGlobal`
   a {
     text-decoration: none;
     color: inherit;
-  }
-
-  a:hover {
-    color: ${COLOR_BLUE};
   }
 
   ul, ol {

@@ -3,6 +3,7 @@ const { mnemonicToSeed } = require('bip39');
 const { fromMasterSeed } = require('ethereumjs-wallet/hdkey');
 const { mnemonic } = require('./secret');
 const lottery = require('./build/contracts/Lottery.json');
+
 const address = '0xd6141c8099670fe22a67eea3224d559c5d05aa55';
 
 const web3 = new Web3('https://testnet-rpc.dexon.org');
@@ -74,7 +75,7 @@ const times = [
 let account;
 let contract;
 
-const runTime = time => {
+const runTime = (time) => {
   if ((time + 5) > (Date.now() / 1000)) {
     setTimeout(() => runTime(time), 5000);
     return;
@@ -89,7 +90,7 @@ const runTime = time => {
 };
 
 mnemonicToSeed(mnemonic)
-  .then(seed => {
+  .then((seed) => {
     const hdWallet = fromMasterSeed(seed);
     const key = hdWallet.derivePath('m/44\'/237\'/0\'/0/0');
     const privateKey = `0x${key._hdkey._privateKey.toString('hex')}`;

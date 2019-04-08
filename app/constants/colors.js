@@ -1,5 +1,5 @@
 export const COLOR_WHITE = '#FFFFFF';
-export const COLOR_BLACK = '#122028';
+export const COLOR_BLACK = '#000000';
 export const COLOR_LIGHT_BLACK = '#0E1519';
 export const COLOR_LIGHTER_BLACK = '#26343C';
 export const COLOR_GRAY = '#AAB9C2';
