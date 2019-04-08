@@ -1,0 +1,13 @@
+export const COLOR_WHITE = '#FFFFFF';
+export const COLOR_BLACK = '#122028';
+export const COLOR_LIGHT_BLACK = '#0E1519';
+export const COLOR_LIGHTER_BLACK = '#26343C';
+export const COLOR_GRAY = '#AAB9C2';
+export const COLOR_LIGHT_GRAY = '#F8F8F8';
+export const COLOR_DARK_GRAY = '#5E6C75';
+export const COLOR_DARKER_GRAY = '#37454E';
+export const COLOR_DIM_GRAY = '#979797';
+export const COLOR_BLUE = '#5D9CCA';
+export const COLOR_RED = '#FF435A';
+export const COLOR_GREEN = '#13BF99';
+export const COLOR_ORANGE = '#F69355';

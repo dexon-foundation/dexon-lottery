@@ -1,0 +1,8 @@
+{
+  "extends": "@cobinhood/eslint-config-cobinhood/node",
+  "rules": {
+    "import/no-dynamic-require": "off",
+    "import/no-named-as-default": "off",
+    "react/forbid-prop-types": "off"
+  }
+}

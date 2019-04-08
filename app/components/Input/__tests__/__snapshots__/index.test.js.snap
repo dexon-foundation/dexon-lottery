@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Input /> should match snapshot 1`] = `
+<styled.div>
+  <Styled(SVG)
+    src="IMAGE_MOCK"
+  />
+  <styled.input />
+</styled.div>
+`;

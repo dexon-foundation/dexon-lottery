@@ -1,0 +1,53 @@
+{
+  "presets": [
+    ["env", {
+      "modules": false,
+      "useBuiltIn": true,
+      "targets": {
+        "browsers": [
+          "> 1%",
+          "last 2 versions",
+          "not ie <= 11",
+          "ios 9",
+          "not ie_mob 10",
+          "not and_uc <= 11.4",
+          "not bb < 10",
+          "not op_mob <= 12",
+          "not Android < 4.4"
+        ]
+      }
+    }],
+    "react",
+    "stage-0",
+    "flow"
+  ],
+  "env": {
+    "production": {
+      "only": [
+        "app"
+      ],
+      "plugins": [
+        "transform-react-remove-prop-types",
+        "transform-react-constant-elements",
+        "transform-react-inline-elements"
+      ]
+    },
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs",
+        "dynamic-import-node"
+      ]
+    }
+  },
+  "plugins": [
+    ["react-loadable/babel", {
+      "webpack": true
+    }],
+    ["module-resolver", {
+      "alias": {
+        "@": "./app"
+      }
+    }],
+    "polished"
+  ]
+}
