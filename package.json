@@ -10,6 +10,7 @@
   },
   "scripts": {
     "postinstall": "touch secret.js",
+    "build": "rm -rf build/ && npm run contract:compile && npm run webapp:build",
     "webapp:dev": "webpack-dev-server --config internals/webpack/webpack.dev.babel.js --mode development --host 0.0.0.0",
     "webapp:build": "NODE_ENV=production webpack --config internals/webpack/webpack.prod.babel.js --color -p --progress --hide-modules --display-optimization-bailout",
     "contract:compile": "dexon-truffle compile",
