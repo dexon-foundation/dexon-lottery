@@ -1,8 +1,8 @@
-# Dexon DApp Workshop
-**Simple Election DApp**
+# DEXON Lottery
+Repository for DEXON lottery event
 
 ## Install
-`npm install`
+`yarn`
 
 ## Compile
 `npm run compile`
