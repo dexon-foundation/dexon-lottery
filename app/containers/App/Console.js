@@ -2,7 +2,9 @@ import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { Container, Header } from '@/components/Mux';
 import LotteryContract from '@/services/Lottery';
+
 import LotteryItem from './LotteryItem';
+import EmptyItem from './EmptyItem';
 
 const StretchedContainer = styled(Container)`
   flex: 1 1 auto;
@@ -23,8 +25,8 @@ class Console extends PureComponent {
   };
 
   componentDidMount() {
-    this.updateList();
-    setInterval(this.updateList, 10000);
+    // this.updateList();
+    // setInterval(this.updateList, 10000);
   }
 
   setBodyRef = (ref) => {
@@ -68,6 +70,8 @@ class Console extends PureComponent {
               rawValue={event.returnValues[2]}
             />
           ))}
+
+          {!list.length && <EmptyItem />}
         </Body>
       </StretchedContainer>
     );
