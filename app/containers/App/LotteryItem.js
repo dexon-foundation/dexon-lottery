@@ -19,6 +19,7 @@ const Marker = styled.span`
 
 const Item = styled.a`
   margin-top: 20px;
+  flex: 1 0 auto;
   display: flex;
   align-items: flex-end;
   white-space: pre;
@@ -26,6 +27,10 @@ const Item = styled.a`
 
   &:last-child ${Marker} {
     display: block;
+  }
+
+  &:first-child {
+    margin-top: 0;
   }
 
   &:hover {

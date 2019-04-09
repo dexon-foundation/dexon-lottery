@@ -13,9 +13,7 @@ const Body = styled.div`
   position: absolute;
   height: calc(100% - 30px);
   width: calc(100% - 40px);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  display: block;
 `;
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -29,12 +27,26 @@ class Console extends PureComponent {
     setInterval(this.updateList, 10000);
   }
 
+  setBodyRef = (ref) => {
+    this.body = ref;
+
+    this.scrollToBottom();
+  };
+
   updateList = () => {
     LotteryContract.getPastEvents('NumberRevealed', {
       fromBlock: 0,
       toBlock: 'latest',
     })
-      .then(events => this.setState({ list: events }));
+      .then(events => this.setState({
+        list: events,
+      }, this.scrollToBottom));
+  }
+
+  scrollToBottom = () => {
+    if (!this.body) return;
+
+    this.body.scrollTop = this.body.offsetHeight;
   }
 
   render() {
@@ -46,7 +58,7 @@ class Console extends PureComponent {
           Lottery History
         </Header>
 
-        <Body>
+        <Body innerRef={this.setBodyRef}>
           {list.map(event => (
             <LotteryItem
               key={event.transactionHash}
