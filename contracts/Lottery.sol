@@ -13,7 +13,7 @@ contract Lottery is Ownable {
     function reveal(uint256 timestamp) public onlyOwner {
         // check if timestamp is in the future
         // or if number of timestamp is already revealed
-        if (timestamp > now || numberOfTime[timestamp] != 0) {
+        if (timestamp * 1000 > now || numberOfTime[timestamp] != 0) {
             revert();
         }
 

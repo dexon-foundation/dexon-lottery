@@ -1,30 +1,31 @@
-const Lottery = artifacts.require("Lottery")
+/* globals artifacts, contract, before, assert */
 
-const PREFIX = "Returned error: VM Exception while processing transaction: ";
-const tryCatch = async function(promise, errType) {
+const Lottery = artifacts.require('Lottery');
+
+const PREFIX = 'Returned error: VM Exception while processing transaction: ';
+const tryCatch = async function tryCatch(promise, errType) {
   try {
     await promise;
     throw null;
-  }
-  catch (error) {
-    assert(error, "Expected an error but did not get one");
-    assert(error.message.startsWith(PREFIX + errType), "Expected an error starting with '" + PREFIX + errType + "' but got '" + error.message + "' instead");
+  } catch (error) {
+    assert(error, 'Expected an error but did not get one');
+    assert(error.message.startsWith(PREFIX + errType), `Expected an error starting with '${PREFIX}${errType}' but got '${error.message}' instead`);
   }
 };
 
-contract('Lottery Contract', (accounts) => {
-  let lotteryContract
+contract('Lottery Contract', () => {
+  let lotteryContract;
 
   before(async () => {
     lotteryContract = await Lottery.new();
-  })
+  });
 
-  it("should not have revealed times at first", async function() {
+  it('should not have revealed times at first', async () => {
     const count = await lotteryContract.revealedTimesCount();
-    assert.equal(count.toString(), '0')
-  })
+    assert.equal(count.toString(), '0');
+  });
 
-  it("should have revealed data after calling reveal", async function() {
+  it('should have revealed data after calling reveal', async () => {
     await lotteryContract.reveal(12345);
 
     const count = await lotteryContract.revealedTimesCount();
@@ -38,9 +39,9 @@ contract('Lottery Contract', (accounts) => {
 
     const futureNumber = await lotteryContract.numberOfTime(12346);
     assert.equal(futureNumber.toString(), '0');
-  })
+  });
 
-  it("should have more revealed data after calling reveal again", async function() {
+  it('should have more revealed data after calling reveal again', async () => {
     await lotteryContract.reveal(12346);
 
     const count = await lotteryContract.revealedTimesCount();
@@ -51,13 +52,13 @@ contract('Lottery Contract', (accounts) => {
 
     const number = await lotteryContract.numberOfTime(12346);
     assert.notEqual(number.toString(), '0');
-  })
+  });
 
-  it("should reject future time", async function() {
+  it('should reject future time', async () => {
     await tryCatch(lotteryContract.reveal(1664631204), 'revert');
-  })
+  });
 
-  it("should reject duplicated time", async function() {
+  it('should reject duplicated time', async () => {
     await tryCatch(lotteryContract.reveal(12345), 'revert');
-  })
-})
+  });
+});
