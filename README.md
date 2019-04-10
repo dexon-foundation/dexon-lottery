@@ -1,5 +1,5 @@
 # DEXON Lottery
-Repository for DEXON lottery event
+Repository for [DEXON lottery event](https://storage.googleapis.com/dexon-lottery/index.html)
 
 ## Install
 `yarn`
