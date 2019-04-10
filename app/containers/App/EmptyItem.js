@@ -1,19 +1,6 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
-
-const blink = keyframes`
-  from, to {
-    color: transparent;
-  }
-
-  50% {
-    color: white;
-  }
-`;
-
-const Marker = styled.span`
-  animation: ${blink} 1s step-end infinite;
-`;
+import styled from 'styled-components';
+import ReactTypingEffect from 'react-typing-effect';
 
 const Item = styled.div`
   flex: 1 0 auto;
@@ -22,10 +9,13 @@ const Item = styled.div`
   white-space: pre;
 `;
 
-const LotteryItem = () => (
+const EmptyItem = () => (
   <Item>
-    Place your bets! We will have a lucky winner soon...<Marker>_</Marker>
+    <ReactTypingEffect
+      speed="100"
+      text="Place your bet! We will have a lucky winner soon..."
+    />
   </Item>
 );
 
-export default LotteryItem;
+export default EmptyItem;

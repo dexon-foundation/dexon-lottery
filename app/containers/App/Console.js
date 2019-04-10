@@ -4,6 +4,7 @@ import { Container, Header } from '@/components/Mux';
 import LotteryContract from '@/services/Lottery';
 
 import LotteryItem from './LotteryItem';
+import LastItem from './LastItem';
 import EmptyItem from './EmptyItem';
 
 const StretchedContainer = styled(Container)`
@@ -15,7 +16,9 @@ const Body = styled.div`
   position: absolute;
   height: calc(100% - 30px);
   width: calc(100% - 40px);
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 `;
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -25,15 +28,15 @@ class Console extends PureComponent {
   };
 
   componentDidMount() {
-    // this.updateList();
-    // setInterval(this.updateList, 10000);
+    this.updateList();
+    setInterval(this.updateList, 10000);
   }
 
-  setBodyRef = (ref) => {
-    this.body = ref;
+  // setBodyRef = (ref) => {
+  //   this.body = ref;
 
-    this.scrollToBottom();
-  };
+  //   this.scrollToBottom();
+  // };
 
   updateList = () => {
     LotteryContract.getPastEvents('NumberRevealed', {
@@ -42,14 +45,14 @@ class Console extends PureComponent {
     })
       .then(events => this.setState({
         list: events,
-      }, this.scrollToBottom));
+      }));
   }
 
-  scrollToBottom = () => {
-    if (!this.body) return;
+  // scrollToBottom = () => {
+  //   if (!this.body) return;
 
-    this.body.scrollTop = this.body.offsetHeight;
-  }
+  //   this.body.scrollTop = this.body.offsetHeight;
+  // }
 
   render() {
     const { list } = this.state;
@@ -60,15 +63,25 @@ class Console extends PureComponent {
           Lottery History
         </Header>
 
-        <Body innerRef={this.setBodyRef}>
-          {list.map(event => (
-            <LotteryItem
-              key={event.transactionHash}
-              hash={event.transactionHash}
-              timestamp={event.returnValues[0]}
-              number={`00${event.returnValues[1]}`.slice(-3)}
-              rawValue={event.returnValues[2]}
-            />
+        <Body>
+          {list.map((event, index) => (
+            index !== list.length - 1 ? (
+              <LotteryItem
+                key={event.transactionHash}
+                hash={event.transactionHash}
+                timestamp={event.returnValues[0]}
+                number={`00${event.returnValues[1]}`.slice(-3)}
+                rawValue={event.returnValues[2]}
+              />
+            ) : (
+              <LastItem
+                key={event.transactionHash}
+                hash={event.transactionHash}
+                timestamp={event.returnValues[0]}
+                number={`00${event.returnValues[1]}`.slice(-3)}
+                rawValue={event.returnValues[2]}
+              />
+            )
           ))}
 
           {!list.length && <EmptyItem />}

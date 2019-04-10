@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import moment from 'moment';
+import ReactTypingEffect from 'react-typing-effect';
 
 const blink = keyframes`
   from, to {
@@ -39,20 +40,20 @@ const Item = styled.a`
   }
 `;
 
-const Gray = styled.span`
-  /* color: #8d8d8d; */
-  display: contents;
-`;
-
-const LotteryItem = ({ timestamp, hash, number }: { timestamp: String, hash: String, number: String }) => (
+const LastItem = ({ timestamp, hash, number }: { timestamp: String, hash: String, number: String }) => (
   <Item
     target="_blank"
     href={`https://testnet.dexscan.app/transaction/${hash}`}
   >
-    <Gray>{'Time:   '}</Gray>{moment(timestamp * 1000).format('MMM Do, LTS ZZ')}<br />
-    <Gray>{'Number: '}</Gray>{number}<br />
-    <Gray>{'TxHash: '}</Gray>{hash}<Marker>|</Marker>
+    <ReactTypingEffect
+      speed={50}
+      typingDelay={100}
+      eraseDelay={100000000000}
+      text={`Time:   ${moment(timestamp * 1000).format('MMM Do, LTS ZZ')}
+Number: ${number}
+TxHash: ${hash}`}
+    />
   </Item>
 );
 
-export default LotteryItem;
+export default LastItem;
