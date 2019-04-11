@@ -20,7 +20,7 @@ const Marker = styled.span`
 const Item = styled.a`
   min-height: min-content;
   margin-top: 20px;
-  flex: 1 0 auto;
+  flex: 0 0 auto;
   display: flex;
   align-items: flex-end;
   white-space: pre;
