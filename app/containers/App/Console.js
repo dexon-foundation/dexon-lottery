@@ -29,7 +29,7 @@ class Console extends PureComponent {
 
   componentDidMount() {
     this.updateList();
-    setInterval(this.updateList, 10000);
+    setInterval(this.updateList, 5000);
   }
 
   // setBodyRef = (ref) => {

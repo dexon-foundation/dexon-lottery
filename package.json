@@ -15,7 +15,8 @@
     "webapp:build": "NODE_ENV=production webpack --config internals/webpack/webpack.prod.babel.js --color -p --progress --hide-modules --display-optimization-bailout",
     "contract:compile": "dexon-truffle compile",
     "contract:test": "dexon-truffle test",
-    "contract:deploy": "dexon-truffle migrate --network=testnet --reset"
+    "contract:deploy": "dexon-truffle migrate --network=testnet --reset",
+    "contract:run": "node ./runTimer.js"
   },
   "dependencies": {
     "@cobinhood/eslint-config-cobinhood": "^0.2.0",

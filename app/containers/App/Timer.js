@@ -4,9 +4,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 
 import { Container, Header } from '@/components/Mux';
-import { times } from '../../../constants';
-
-const LAUNCH_TIME = 1556164800000;
+import { times, launchTime } from '../../../constants';
 
 const HorizontalContainer = styled.div`
   display: flex;
@@ -30,7 +28,7 @@ const findNext = () => times.find(time => time * 1000 > Date.now()) * 1000 || 0;
 
 class Timer extends PureComponent {
   state = {
-    mainnetDuration: LAUNCH_TIME - Date.now(),
+    mainnetDuration: launchTime - Date.now(),
     drawDuration: findNext() - Date.now(),
   };
 
@@ -42,7 +40,7 @@ class Timer extends PureComponent {
     const nextTime = findNext();
 
     this.setState({
-      mainnetDuration: LAUNCH_TIME - Date.now(),
+      mainnetDuration: launchTime - Date.now(),
       drawDuration: nextTime - Date.now(),
     });
   }
